@@ -6,6 +6,7 @@ const {
   errorHandler,
 } = require("./middleware/common/errorHandler");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 require("dotenv").config();
 
 // Init express app
@@ -34,6 +35,9 @@ app.use(cors(corsOptions));
 
 // Use cookie-parser with a secret key for signed cookies
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, "public")));
 
 // MongoDB Connection
 mongoose
