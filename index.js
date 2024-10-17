@@ -5,14 +5,35 @@ const {
   notFoundHandler,
   errorHandler,
 } = require("./middleware/common/errorHandler");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
+// Init express app
 const app = express();
+
+// Init server port number
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// Request parsers
+// Parsing for application/json
 app.use(express.json());
+
+// Parsing for application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+
+// Define cors options
+const corsOptions = {
+  origin: ["https://44fahadhasan.netlify.app", "http://localhost:5173"], // Allowed origins
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Allowed methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, // Allow cookies or credentials to be sent
+};
+
+// Enable cors with options
+app.use(cors(corsOptions));
+
+// Use cookie-parser with a secret key for signed cookies
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // MongoDB Connection
 mongoose
@@ -29,7 +50,7 @@ app.use(notFoundHandler);
 // Default common error handler
 app.use(errorHandler);
 
-// Start Server
+// Start server
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
