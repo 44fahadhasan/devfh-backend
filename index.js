@@ -1,6 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const {
+  notFoundHandler,
+  errorHandler,
+} = require("./middleware/common/errorHandler");
 require("dotenv").config();
 
 const app = express();
@@ -18,6 +22,12 @@ mongoose
 
 // Routes
 app.get("/", (req, res) => res.send("DEVFH Backend Running"));
+
+// Not found handler (404)
+app.use(notFoundHandler);
+
+// Default common error handler
+app.use(errorHandler);
 
 // Start Server
 app.listen(PORT, () =>
