@@ -46,7 +46,7 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
-app.get("/", (req, res) => res.send("DEVFH Backend Running"));
+app.get("/", (req, res) => res.send("DEV.FH Server Running"));
 
 // Not found handler (404)
 app.use(notFoundHandler);
