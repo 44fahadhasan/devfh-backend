@@ -1,60 +1,67 @@
+// External imports
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
+require("dotenv").config();
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const favicon = require("serve-favicon");
+
+// Internal imports
 const {
   notFoundHandler,
   errorHandler,
 } = require("./middleware/common/errorHandler");
-const cookieParser = require("cookie-parser");
-const path = require("path");
-require("dotenv").config();
+const connectDB = require("./config/database");
+const projectRoutes = require("./routes/projectRoutes");
 
-// Init express app
+// Initialize Express application
 const app = express();
 
-// Init server port number
+// Define server port
 const PORT = process.env.PORT || 5000;
 
-// Request parsers
-// Parsing for application/json
+// Middleware setup
+// JSON body parsing
 app.use(express.json());
 
-// Parsing for application/x-www-form-urlencoded
+// URL-encoded data parsing for form submissions
 app.use(express.urlencoded({ extended: true }));
 
-// Define cors options
+// CORS configuration to control access to server resources
 const corsOptions = {
   origin: ["https://44fahadhasan.netlify.app", "http://localhost:5173"], // Allowed origins
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Allowed methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-  credentials: true, // Allow cookies or credentials to be sent
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // Allowed HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers in requests
+  credentials: true, // Allow cookies and credentials to be sent
 };
-
-// Enable cors with options
 app.use(cors(corsOptions));
 
-// Use cookie-parser with a secret key for signed cookies
+// Enable cookie parsing with a secret for signed cookies
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-// Serve static files from the 'public' folder
+// Serve static assets from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// Serve favicon for browser default request
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
-// Routes
+// Connect to MongoDB
+connectDB();
+
+// Define routes
+// Health check route
 app.get("/", (req, res) => res.send("DEV.FH Server Running"));
 
-// Not found handler (404)
+// Project-related API routes
+app.use("/api/projects", projectRoutes);
+
+// Custom 404 handler for unknown routes
 app.use(notFoundHandler);
 
-// Default common error handler
+// General error handler for handling server errors
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
-);
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

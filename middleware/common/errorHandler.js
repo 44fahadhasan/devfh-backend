@@ -2,9 +2,11 @@ const createError = require("http-errors");
 
 // Not found handler (404)
 const notFoundHandler = (req, res, next) => {
-  next(
-    createError("We’re sorry, because the requested resource was not found!")
+  const error = createError(
+    404,
+    "We’re sorry, but the requested resource was not found!"
   );
+  next(error);
 };
 
 // Default error handler
